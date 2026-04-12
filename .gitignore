@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Data
+data/
+output/
+
+# Numpy
+*.npy
+*.npz
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
