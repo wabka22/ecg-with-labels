@@ -1,8 +1,14 @@
-import numpy as np
+from pathlib import Path
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def plot_signal_with_labels(signal_path, labels_path, channel=0):
+def plot_signal_with_labels(
+    signal_path: str | Path,
+    labels_path: str | Path,
+    channel: int = 0,
+) -> None:
     signal = np.load(signal_path)
     labels = np.load(labels_path)
 
@@ -19,14 +25,13 @@ def plot_signal_with_labels(signal_path, labels_path, channel=0):
         0: "green",
         1: "red",
         2: "blue",
-        3: "orange"
+        3: "orange",
     }
 
+    used_labels = set()
+
     for label in unique_labels:
-        mask = lab == label
-
-        indices = np.where(mask)[0]
-
+        indices = np.where(lab == label)[0]
         if len(indices) == 0:
             continue
 
@@ -35,26 +40,18 @@ def plot_signal_with_labels(signal_path, labels_path, channel=0):
         for i in range(1, len(indices)):
             if indices[i] != indices[i - 1] + 1:
                 end = indices[i - 1]
-                plt.axvspan(start, end, alpha=0.3,
-                            color=colors.get(label, "gray"),
-                            label=f"label {label}")
+                plot_label = f"label {label}" if label not in used_labels else None
+                plt.axvspan(start, end, alpha=0.3, color=colors.get(label, "gray"), label=plot_label)
+                used_labels.add(label)
                 start = indices[i]
 
-        plt.axvspan(start, indices[-1], alpha=0.3,
-                    color=colors.get(label, "gray"))
+        plot_label = f"label {label}" if label not in used_labels else None
+        plt.axvspan(start, indices[-1], alpha=0.3, color=colors.get(label, "gray"), label=plot_label)
+        used_labels.add(label)
 
     plt.title(f"Channel {channel}")
     plt.xlabel("Sample")
     plt.ylabel("Amplitude")
     plt.legend()
     plt.grid()
-
     plt.show()
-
-
-if __name__ == "__main__":
-    plot_signal_with_labels(
-        signal_path="output/0/signal.npy",
-        labels_path="output/0/labels.npy",
-        channel=0
-    )
